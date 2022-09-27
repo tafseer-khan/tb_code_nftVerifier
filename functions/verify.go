@@ -2,6 +2,9 @@ package lib
 
 import (
 	"bitbucket.org/taubyte/go-sdk/event"
+	ethereum "bitbucket.org/taubyte/go-sdk/ethereum/client"
+	ethBytes "bitbucket.org/taubyte/go-sdk/ethereum/client/bytes"
+	http "bitbucket.org/taubyte/go-sdk/http/client"
 )
 
 //export verify
