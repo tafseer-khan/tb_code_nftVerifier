@@ -1,0 +1,78 @@
+package lib
+
+import (
+	"bitbucket.org/taubyte/go-sdk/event"
+)
+
+//export verify
+func verify(e event.Event) uint32 {
+	h, err := e.HTTP()
+	if err != nil {
+		panic(err)
+		return 1
+	}
+
+	errReturn := func(msg string) {
+		h.Write([]byte(msg))
+		h.Return(404)
+	}
+
+	client, err := ethereum.New("https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161")
+	if err != nil {
+		errReturn("Unable to connect to rpc client")
+		return 1
+	}
+
+	contractAddress := "0xf4910C763eD4e47A585E2D34baA9A4b611aE448C"
+
+	httpClient, err := http.New()
+	if err != nil {
+		errReturn("Unable to get http client")
+		return 1
+	}
+
+	req, err := httpClient.Request(fmt.Sprintf("https://api-goerli.etherscan.io/api?module=contract&action=getabi&format=raw&address=%s&apikey=GJ9AZ69URIFNGXCUGXN2GSSRSPB16HI3M7", contractAddress))
+	if err != nil {
+		errReturn("Unable to get http request")
+		return 1
+	}
+
+	res, err := req.Do()
+	if err != nil {
+		errReturn("Unable to get http client")
+		return 1
+	}
+
+	contract, err := client.NewBoundContract(res.Body(), contractAddress)
+	if err != nil {
+		errReturn("Unable to create bound contract")
+		return
+	}
+
+	balanceOf, err := contract.Method("balanceOf")
+	if err != nil {
+		errReturn("Unable to create method balanceOf")
+		return
+	}
+	addressString := "0xB2c977Cf2cEb8f501eEAfA59Bc8f9919D5c61959"
+	address := ethBytes.AddressFromHex(addressString)
+	tokenId, ok := new(big.Int).SetString("80867650201096745079196794753906950580251458356280840071563152651088098754660", 10)
+	if ok == false {
+		errReturn("Unable to create tokenId")
+		return
+	}
+	outputs, err := balanceOf.Call(address, tokenId)
+	if err != nil {
+		errReturn("Cannot call balance of with: " + err.Error())
+		return
+	}
+
+	if outputs[0].(*big.Int).Cmp(big.NewInt(0)) == 0 {
+		errReturn("Cannot verify NFT ownership at given wallet address")
+		return
+	}
+
+    h.Write([]byte("NFT ownership verified"))
+
+	return 0
+}
