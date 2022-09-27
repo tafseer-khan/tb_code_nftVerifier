@@ -51,13 +51,13 @@ func verify(e event.Event) uint32 {
 	contract, err := client.NewBoundContract(res.Body(), contractAddress)
 	if err != nil {
 		errReturn("Unable to create bound contract")
-		return
+		return 1
 	}
 
 	balanceOf, err := contract.Method("balanceOf")
 	if err != nil {
 		errReturn("Unable to create method balanceOf")
-		return
+		return 1
 	}
 
 	addressString := h.Query().Get("address")
@@ -65,17 +65,18 @@ func verify(e event.Event) uint32 {
 	tokenId, ok := new(big.Int).SetString("80867650201096745079196794753906950580251458356280840071563152651088098754660", 10)
 	if ok == false {
 		errReturn("Unable to create tokenId")
-		return
+		return 1
 	}
 
 	outputs, err := balanceOf.Call(address, tokenId)
 	if err != nil {
 		errReturn("Cannot call balance of with: " + err.Error())
-		return
+		return 1
 	}
 
 	if outputs[0].(*big.Int).Cmp(big.NewInt(0)) == 0 {
 		errReturn("Holder does not own NFT")
+		return 1
 	}
 
 	h.Return(200)
