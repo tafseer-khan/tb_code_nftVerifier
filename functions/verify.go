@@ -51,33 +51,34 @@ func verify(e event.Event) uint32 {
 	contract, err := client.NewBoundContract(res.Body(), contractAddress)
 	if err != nil {
 		errReturn("Unable to create bound contract")
-		return 0
+		return
 	}
 
 	balanceOf, err := contract.Method("balanceOf")
 	if err != nil {
 		errReturn("Unable to create method balanceOf")
-		return 0
+		return
 	}
-	addressString := "0xB2c977Cf2cEb8f501eEAfA59Bc8f9919D5c61959"
+
+	addressString := h.Query().Get("address")
 	address := ethBytes.AddressFromHex(addressString)
 	tokenId, ok := new(big.Int).SetString("80867650201096745079196794753906950580251458356280840071563152651088098754660", 10)
 	if ok == false {
 		errReturn("Unable to create tokenId")
-		return 0
+		return
 	}
+
 	outputs, err := balanceOf.Call(address, tokenId)
 	if err != nil {
 		errReturn("Cannot call balance of with: " + err.Error())
-		return 0
+		return
 	}
 
 	if outputs[0].(*big.Int).Cmp(big.NewInt(0)) == 0 {
-		errReturn("Cannot verify NFT ownership at given wallet address")
-		return 0
+		errReturn("Holder does not own NFT")
 	}
 
-    h.Write([]byte("NFT ownership verified"))
+	h.Return(200)
 
 	return 0
 }
