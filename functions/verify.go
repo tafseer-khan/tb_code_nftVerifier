@@ -60,7 +60,7 @@ func verify(e event.Event) uint32 {
 		return 1
 	}
 
-	addressString := h.Query().Get("address")
+	addressString, _ := h.Query().Get("address")
 	address := ethBytes.AddressFromHex(addressString)
 	tokenId, ok := new(big.Int).SetString("80867650201096745079196794753906950580251458356280840071563152651088098754660", 10)
 	if ok == false {
