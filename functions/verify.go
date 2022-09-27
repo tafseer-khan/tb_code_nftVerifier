@@ -1,6 +1,8 @@
 package lib
 
 import (
+	"fmt"
+	"math/big"
 	"bitbucket.org/taubyte/go-sdk/event"
 	ethereum "bitbucket.org/taubyte/go-sdk/ethereum/client"
 	ethBytes "bitbucket.org/taubyte/go-sdk/ethereum/client/bytes"
