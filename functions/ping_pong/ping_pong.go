@@ -11,7 +11,7 @@ func ping(e event.Event) uint32 {
 		return 1
 	}
 
-	h.Write([]byte("PONG5"))
+	h.Write([]byte("PONGZ"))
 
 	return 0
 }
